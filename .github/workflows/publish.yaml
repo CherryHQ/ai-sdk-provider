@@ -41,7 +41,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish to npm
         run: |
-          if [ "${{ github.event.release.prerelease }}" = "true" ]; then
+          VERSION="${{ steps.get_version.outputs.VERSION }}"
+          if [[ "$VERSION" == *"beta"* || "$VERSION" == *"alpha"* || "$VERSION" == *"rc"* ]]; then
             pnpm publish --provenance --access public --no-git-checks --tag beta
           else
             pnpm publish --provenance --access public --no-git-checks
