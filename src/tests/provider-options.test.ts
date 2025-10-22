@@ -1,6 +1,6 @@
 import type { ModelMessage } from 'ai';
 
-import { createTestServer } from '@ai-sdk/provider-utils/test';
+import { createTestServer } from '@ai-sdk/test-server/with-vitest';
 import { streamText } from 'ai';
 import { describe, expect, it, vi } from 'vitest';
 import { createOpenRouter } from '../provider';

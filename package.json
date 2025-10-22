@@ -1,6 +1,7 @@
 {
-  "name": "@openrouter/ai-sdk-provider",
+  "name": "@cherrystudio/ai-sdk-provider",
   "version": "1.2.0",
+  "description": "fork @OpenRouter/ai-sdk-provider",
   "license": "Apache-2.0",
   "sideEffects": false,
   "main": "./dist/index.js",
@@ -37,13 +38,15 @@
     }
   },
   "devDependencies": {
-    "@ai-sdk/provider": "2.0.0",
-    "@ai-sdk/provider-utils": "3.0.1",
+    "@ai-sdk/provider": "3.0.0-beta.8",
+    "@ai-sdk/provider-utils": "4.0.0-beta.20",
+    "@ai-sdk/test-server": "1.0.0-beta.1",
     "@biomejs/biome": "2.1.3",
     "@edge-runtime/vm": "5.0.0",
     "@types/node": "24.2.0",
-    "ai": "5.0.5",
+    "ai": "6.0.0-beta.66",
     "dotenv": "17.2.1",
+    "msw": "^2.11.6",
     "tsup": "8.5.0",
     "typescript": "5.9.2",
     "vite-tsconfig-paths": "5.1.4",
@@ -60,13 +63,13 @@
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/OpenRouterTeam/ai-sdk-provider",
+  "homepage": "https://github.com/CherryHQ/ai-sdk-provider",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OpenRouterTeam/ai-sdk-provider.git"
+    "url": "git+https://github.com/CherryHQ/ai-sdk-provider.git"
   },
   "bugs": {
-    "url": "https://github.com/OpenRouterTeam/ai-sdk-provider/issues"
+    "url": "https://github.com/CherryHQ/ai-sdk-provider/issues"
   },
   "keywords": [
     "ai"

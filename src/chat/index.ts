@@ -1,13 +1,13 @@
 import type {
-  LanguageModelV2,
-  LanguageModelV2CallOptions,
-  LanguageModelV2CallWarning,
-  LanguageModelV2Content,
-  LanguageModelV2FinishReason,
-  LanguageModelV2ResponseMetadata,
-  LanguageModelV2StreamPart,
-  LanguageModelV2Usage,
-  SharedV2Headers,
+  LanguageModelV3,
+  LanguageModelV3CallOptions,
+  LanguageModelV3CallWarning,
+  LanguageModelV3Content,
+  LanguageModelV3FinishReason,
+  LanguageModelV3ResponseMetadata,
+  LanguageModelV3StreamPart,
+  LanguageModelV3Usage,
+  SharedV3Headers,
 } from '@ai-sdk/provider';
 import type { ParseResult } from '@ai-sdk/provider-utils';
 import type { FinishReason } from 'ai';
@@ -31,12 +31,12 @@ import { ReasoningDetailType } from '@/src/schemas/reasoning-details';
 import { openrouterFailedResponseHandler } from '../schemas/error-response';
 import { mapOpenRouterFinishReason } from '../utils/map-finish-reason';
 import { convertToOpenRouterChatMessages } from './convert-to-openrouter-chat-messages';
+import { getBase64FromDataUrl, getMediaType } from './file-url-utils';
 import { getChatCompletionToolChoice } from './get-tool-choice';
 import {
   OpenRouterNonStreamChatCompletionResponseSchema,
   OpenRouterStreamChatCompletionChunkSchema,
 } from './schemas';
-import { getBase64FromDataUrl, getMediaType } from './file-url-utils';
 
 type OpenRouterChatConfig = {
   provider: string;
@@ -47,8 +47,8 @@ type OpenRouterChatConfig = {
   extraBody?: Record<string, unknown>;
 };
 
-export class OpenRouterChatLanguageModel implements LanguageModelV2 {
-  readonly specificationVersion = 'v2' as const;
+export class OpenRouterChatLanguageModel implements LanguageModelV3 {
+  readonly specificationVersion = 'v3' as const;
   readonly provider = 'openrouter';
   readonly defaultObjectGenerationMode = 'tool' as const;
 
@@ -88,7 +88,7 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
     topK,
     tools,
     toolChoice,
-  }: LanguageModelV2CallOptions) {
+  }: LanguageModelV3CallOptions) {
     const baseArgs = {
       // model id:
       model: this.modelId,
@@ -185,11 +185,11 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
     return baseArgs;
   }
 
-  async doGenerate(options: LanguageModelV2CallOptions): Promise<{
-    content: Array<LanguageModelV2Content>;
-    finishReason: LanguageModelV2FinishReason;
-    usage: LanguageModelV2Usage;
-    warnings: Array<LanguageModelV2CallWarning>;
+  async doGenerate(options: LanguageModelV3CallOptions): Promise<{
+    content: Array<LanguageModelV3Content>;
+    finishReason: LanguageModelV3FinishReason;
+    usage: LanguageModelV3Usage;
+    warnings: Array<LanguageModelV3CallWarning>;
     providerMetadata?: {
       openrouter: {
         provider: string;
@@ -197,8 +197,8 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
       };
     };
     request?: { body?: unknown };
-    response?: LanguageModelV2ResponseMetadata & {
-      headers?: SharedV2Headers;
+    response?: LanguageModelV3ResponseMetadata & {
+      headers?: SharedV3Headers;
       body?: unknown;
     };
   }> {
@@ -232,7 +232,7 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
     }
 
     // Extract detailed usage information
-    const usageInfo: LanguageModelV2Usage = response.usage
+    const usageInfo: LanguageModelV3Usage = response.usage
       ? {
           inputTokens: response.usage.prompt_tokens ?? 0,
           outputTokens: response.usage.completion_tokens ?? 0,
@@ -254,7 +254,7 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
 
     const reasoningDetails = choice.message.reasoning_details ?? [];
 
-    const reasoning: Array<LanguageModelV2Content> =
+    const reasoning: Array<LanguageModelV3Content> =
       reasoningDetails.length > 0
         ? reasoningDetails
             .map((detail) => {
@@ -303,7 +303,7 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
             ]
           : [];
 
-    const content: Array<LanguageModelV2Content> = [];
+    const content: Array<LanguageModelV3Content> = [];
 
     // Add reasoning content first
     content.push(...reasoning);
@@ -393,12 +393,12 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
     };
   }
 
-  async doStream(options: LanguageModelV2CallOptions): Promise<{
-    stream: ReadableStream<LanguageModelV2StreamPart>;
-    warnings: Array<LanguageModelV2CallWarning>;
+  async doStream(options: LanguageModelV3CallOptions): Promise<{
+    stream: ReadableStream<LanguageModelV3StreamPart>;
+    warnings: Array<LanguageModelV3CallWarning>;
     request?: { body?: unknown };
-    response?: LanguageModelV2ResponseMetadata & {
-      headers?: SharedV2Headers;
+    response?: LanguageModelV3ResponseMetadata & {
+      headers?: SharedV3Headers;
       body?: unknown;
     };
   }> {
@@ -452,7 +452,7 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
     }> = [];
 
     let finishReason: FinishReason = 'other';
-    const usage: LanguageModelV2Usage = {
+    const usage: LanguageModelV3Usage = {
       inputTokens: Number.NaN,
       outputTokens: Number.NaN,
       totalTokens: Number.NaN,
@@ -476,7 +476,7 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
           ParseResult<
             z.infer<typeof OpenRouterStreamChatCompletionChunkSchema>
           >,
-          LanguageModelV2StreamPart
+          LanguageModelV3StreamPart
         >({
           transform(chunk, controller) {
             // handle failed chunk parsing / validation:
@@ -788,7 +788,7 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
                   type: 'file',
                   mediaType: getMediaType(image.image_url.url, 'image/jpeg'),
                   data: getBase64FromDataUrl(image.image_url.url),
-                })
+                });
               }
             }
           },
@@ -832,12 +832,12 @@ export class OpenRouterChatLanguageModel implements LanguageModelV2 {
             } = {
               usage: openrouterUsage,
             };
-            
+
             // Only include provider if it's actually set
             if (provider !== undefined) {
               openrouterMetadata.provider = provider;
             }
-            
+
             controller.enqueue({
               type: 'finish',
               finishReason,

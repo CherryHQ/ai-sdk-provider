@@ -1,4 +1,4 @@
-import type { LanguageModelV2FilePart } from '@ai-sdk/provider';
+import type { LanguageModelV3FilePart } from '@ai-sdk/provider';
 
 import { convertUint8ArrayToBase64 } from '@ai-sdk/provider-utils';
 import { isUrl } from './is-url';
@@ -7,7 +7,7 @@ export function getFileUrl({
   part,
   defaultMediaType,
 }: {
-  part: LanguageModelV2FilePart;
+  part: LanguageModelV3FilePart;
   defaultMediaType: string;
 }) {
   if (part.data instanceof Uint8Array) {
@@ -31,9 +31,12 @@ export function getFileUrl({
     : `data:${part.mediaType ?? defaultMediaType};base64,${stringUrl}`;
 }
 
-export function getMediaType(dataUrl: string, defaultMediaType: string): string {
+export function getMediaType(
+  dataUrl: string,
+  defaultMediaType: string,
+): string {
   const match = dataUrl.match(/^data:([^;]+)/);
-  return match ? match[1] ?? defaultMediaType : defaultMediaType;
+  return match ? (match[1] ?? defaultMediaType) : defaultMediaType;
 }
 
 export function getBase64FromDataUrl(dataUrl: string): string {
