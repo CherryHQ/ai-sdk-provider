@@ -1,7 +1,5 @@
 name: Publish package
 on:
-  release:
-    types: [published]
   push:
     tags:
       - v*.*.*
@@ -25,15 +23,6 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm build
       - run: pnpm test
-      - name: Publish to npm
-        run: |
-          if [ "${{ github.event.release.prerelease }}" = "true" ]; then
-            pnpm publish --provenance --access public --no-git-checks --tag beta
-          else
-            pnpm publish --provenance --access public --no-git-checks
-          fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Create package
         run: pnpm pack
       
@@ -47,6 +36,15 @@ jobs:
           name: Release ${{ steps.get_version.outputs.VERSION }}
           files: cherrystudio-ai-sdk-provider-*.tgz
           draft: false
-          prerelease: false
+          prerelease: ${{ contains(steps.get_version.outputs.VERSION, 'beta') || contains(steps.get_version.outputs.VERSION, 'alpha') || contains(steps.get_version.outputs.VERSION, 'rc') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish to npm
+        run: |
+          if [ "${{ github.event.release.prerelease }}" = "true" ]; then
+            pnpm publish --provenance --access public --no-git-checks --tag beta
+          else
+            pnpm publish --provenance --access public --no-git-checks
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
