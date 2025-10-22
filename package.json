@@ -1,6 +1,6 @@
 {
   "name": "@cherrystudio/ai-sdk-provider",
-  "version": "1.2.0",
+  "version": "1.2.1-beta.0",
   "description": "fork @OpenRouter/ai-sdk-provider",
   "license": "Apache-2.0",
   "sideEffects": false,
