@@ -45,7 +45,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:     
           name: Release ${{ steps.get_version.outputs.VERSION }}
-          files: cherrystudio-mac-system-ocr-*.tgz
+          files: cherrystudio-ai-sdk-provider-*.tgz
           draft: false
           prerelease: false
         env:
